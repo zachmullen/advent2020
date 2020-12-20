@@ -3,8 +3,7 @@ import re
 with open('input19') as fd:
     lines = fd.read().splitlines()
 
-literals = {}
-rules = {}
+rules, literals = {}, {}
 for i, line in enumerate(lines):
     if not line:
         break
@@ -14,20 +13,35 @@ for i, line in enumerate(lines):
     else:
         rules[num] = [l.split() for l in match.split('|')]
 
-msgs = lines[i + 1:]
-
 def build_re(n) -> str:
     if n in literals:
         return literals[n]
+    return f'({"|".join(["".join(build_re(p) for p in r) for r in rules[n]])})'
 
-    rule = rules[n]
-    if len(rule) == 1:
-        return ''.join(f'({build_re(p)})' for p in rule[0])
-    elif len(rule) == 2:
-        p0 = ''.join(f'({build_re(p)})' for p in rule[0])
-        p1 = ''.join(f'({build_re(p)})' for p in rule[1])
-        return '|'.join((p0, p1))
+re31, re42 = [re.compile(build_re(n)) for n in ['31', '42']]
+n_matches = 0
+for msg in lines[i + 1:]:
+    n_42s = n_31s = 0
+    matching42 = True
 
-r0_regex = re.compile(build_re("0"))
-print(sum(1 for m in msgs if r0_regex.fullmatch(m)))
+    while msg:
+        if matching42:
+            match42 = re42.match(msg)
+            if match42:
+                n_42s += 1
+                msg = msg[len(match42.groups()[0]):]
+                continue
+            elif n_42s:
+                matching42 = False
+            else:
+                break
 
+        match31 = re31.match(msg)
+        if match31:
+            n_31s += 1
+            msg = msg[len(match31.groups()[0]):]
+        else:
+            break
+    n_matches += int(0 < n_31s < n_42s and not msg)
+
+print(n_matches)
