@@ -32,16 +32,11 @@ while i < len(lines):
     tile_edges[tilenum] = [top, right, bottom, left]
     i += 11
 
-corners = []
+corner_tiles = []
+edge_tiles = []
 for num, (top, right, bottom, left) in tile_edges.items():
-    pairs = [
-        (top, right), (right, bottom), (bottom, left), (left, top),
-        # flip horiz
-        (top[::-1], right), (top[::-1], left), (bottom[::-1], left), (bottom[::-1], right),
-        # flip vert
-        (top, right[::-1]), (top, left[::-1]), (bottom, right[::-1]), (bottom, left[::-1]),
-    ]
+    pairs = [(top, right), (right, bottom), (bottom, left), (left, top)]
     if any(edges[s1] == [num] and edges[s2] == [num] for s1, s2 in pairs):
-        corners.append(num)
+        corner_tiles.append(num)
 
-print(math.prod(corners))
+print(math.prod(corner_tiles))
