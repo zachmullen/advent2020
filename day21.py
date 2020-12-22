@@ -16,6 +16,6 @@ while max(len(l) for l in mapping.values()) > 1:
         if len(l) == 1:
             for other in mapping.values():
                 if other is not l:
-                    other.difference_update(l)
+                    other -= l
 
 print(','.join(list(mapping[k])[0] for k in sorted(mapping.keys())))
