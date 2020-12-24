@@ -1,8 +1,8 @@
 with open('input24') as fd:
     paths = fd.read().splitlines()
 
-tiles = set()
-for path in paths:
+blacks = set()
+for path in paths:  # build initial state
     i = x = y = 0
 
     while i < len(path):
@@ -25,9 +25,25 @@ for path in paths:
             i += 2
             x, y = x - 1, y + 1
 
-    if (x, y) in tiles:
-        tiles.remove((x, y))
+    if (x, y) in blacks:
+        blacks.remove((x, y))
     else:
-        tiles.add((x, y))
+        blacks.add((x, y))
 
-print(len(tiles))
+for _ in range(100):  # conway
+    cpy = blacks.copy()
+    whites = set()
+    for x, y in blacks:
+        neighbors = {(x+1, y), (x-1, y), (x+1, y-1), (x, y-1), (x, y+1), (x-1, y+1)}
+        whites |= (neighbors - blacks)
+        if len(blacks & neighbors) not in [1, 2]:
+            cpy.remove((x, y))
+
+    for x, y in whites:
+        neighbors = {(x+1, y), (x-1, y), (x+1, y-1), (x, y-1), (x, y+1), (x-1, y+1)}
+        if len(blacks & neighbors) == 2:
+            cpy.add((x, y))
+
+    blacks = cpy
+
+print(len(blacks))
